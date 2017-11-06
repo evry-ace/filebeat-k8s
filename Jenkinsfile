@@ -3,11 +3,6 @@
 properties([
   parameters([
     string(
-      name: 'K8S_CLUSTER',
-      defaultValue: 'kubernetes.demo',
-      description: 'The Kubernetes Cluster you want to deploy to',
-    ),
-    string(
       name: 'ACEME_EMAIL',
       defaultValue: 'hans.flaatten@evry.com',
       description: 'LetsEncrypt ACEME registration email',
@@ -38,7 +33,6 @@ node('jenkins-docker-3') {
 
       config = new Config(this).branchProperties(envPatterns)
       config.ACEME_EMAIL = env.ACEME_EMAIL
-      config.K8S_CLUSTER = env.K8S_CLUSTER
 
       stage("Deploy") {
         def Boolean dryrun = config.JENKINS_DEPLOY != 'true'
