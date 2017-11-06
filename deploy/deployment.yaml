@@ -1,0 +1,55 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: "${K8S_NAME}"
+  namespace: "${K8S_NAMESPACE}"
+  labels:
+    k8s-app: "${K8S_APP}"
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: "${K8S_APP}"
+        name: "${K8S_APP}"
+    spec:
+      containers:
+      - name: "${K8S_APP}"
+        image: "${FILEBEAT_IMAGE}:${FILEBEAT_VERSION}"
+        resources:
+          limits:
+            cpu: 50m
+            memory: 50Mi
+        env:
+          - name: LOGSTASH_HOSTS
+            value: "${LOGSTASH_HOST}"
+          - name: LOG_LEVEL
+            value: "${FILEBEAT_LOG_LEVEL}"
+          - name: FILEBEAT_HOST
+            valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log/containers
+        - name: varlogpods
+          mountPath: /var/log/pods
+          readOnly: true
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log/containers
+      - name: varlogpods
+        hostPath:
+          path: /var/log/pods
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+      imagePullSecrets:
+      - name: "${DOCKER_REGISTRY}"
