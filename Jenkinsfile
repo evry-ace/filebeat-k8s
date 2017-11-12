@@ -29,6 +29,7 @@ node('jenkins-docker-3') {
       // Jenkins build and Kubernetes deployment.
       def envPatterns = [
         [env: 'prod', regex: /^master$/],
+        [env: 'dev', regex: /^feature\/dev-env$/]
       ]
 
       config = new Config(this).branchProperties(envPatterns)
