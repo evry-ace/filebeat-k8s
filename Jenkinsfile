@@ -3,9 +3,14 @@
 properties([
   parameters([
     string(
-      name: 'ACEME_EMAIL',
-      defaultValue: 'hans.flaatten@evry.com',
-      description: 'LetsEncrypt ACEME registration email',
+      name: 'K8S_CLUSTER',
+      defaultValue: 'kubernetes.ace.dev',
+      description: 'The Kubernetes Cluster you want to deploy to',
+    ),
+    string(
+      name: 'LOGSTASH_HOST',
+      defaultValue: 'add logstash url',
+      description: 'The Logstash url you want to log to',
     ),
   ])
 ])
@@ -28,12 +33,13 @@ node('jenkins-docker-3') {
       // configurations are stored in the /build directory and controles the
       // Jenkins build and Kubernetes deployment.
       def envPatterns = [
-        [env: 'prod', regex: /^master$/],
-        [env: 'dev', regex: /^feature\/dev-env$/]
+        [env: 'prod', regex: /^master$/]
       ]
 
       config = new Config(this).branchProperties(envPatterns)
-      config.ACEME_EMAIL = env.ACEME_EMAIL
+      [ 'K8S_CLUSTER',
+        'LOGSTASH_HOST',
+      ].eachWithIndex { item, index -> config[item] = env[item] }
 
       stage("Deploy") {
         def Boolean dryrun = config.JENKINS_DEPLOY != 'true'
