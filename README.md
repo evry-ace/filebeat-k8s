@@ -3,8 +3,6 @@ Filebeat Kubernetes DaemonSet
 
 Enable the cluster to log into logstash and then eventually into elasticsearch.
 
-Currently we use the existing Elastic server used for ITF.
-
 ## Elastic
 
 https://elastic.evrybgo.no/
